@@ -15,3 +15,6 @@ Project aimed at fitting (blackbody and bremsstrahlung) radiation from a backlig
 
 ## correct_fitting_planckian_diff.png
 06/09 Corrected the units for the fitting_planckian_diff_temp.py file
+
+## uv_xray_sum.png
+06/25 Plotting the superposition of xray and uv rays
