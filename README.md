@@ -6,3 +6,7 @@ Project aimed at fitting (blackbody and bremsstrahlung) radiation from a backlig
 
 ## fitting_planckian_diff_temps.png
 06/05 result of the testing_temps_spectra
+
+## estimate_sun_temp.py
+06/09 Estimating the sun's temperature using spectrocopic data
+
