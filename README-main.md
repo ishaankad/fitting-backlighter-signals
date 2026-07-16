@@ -42,7 +42,7 @@ Metropolis Markov Chain Monte Carlo:
 
 The ratio between the probability densities between the two creates a clean acceptance value $$alpha$$. Thereby, the chance of this draw being accepted or not becomes $$alpha$$.
 
-
+Burn-ins are the inital set of draws that are discarded as they are used in bringing out the algorithm to a spot where we can draw probable samples that are useful. This way our collection of samples contains less error and is more concentrated towards the true parameter.
 
 ## Methodology
 
@@ -53,9 +53,9 @@ I set true parameters, such as temperature, the value my model is to guess, in t
 After defining my variables and true parameters, I calculate irradiances of blackbody and bremsstrahlung radiations. I superpose both arrays across a range of photon energies, and pass it into py.Model()
 
 
-My model takes in this irradiance as "observed data". 
+The model takes in this irradiance as "observed data". 
 
-Takes in a prior belief for parameter $$theta$$, whose likelihood is presented to be P($$theta$$). The model takes this prior, in this case temperture, and calculates the irradiance using the Planck's law for the guess temperture of the Blackbody and Bremsstrahlung equation for the guess temperature of the Bremsstrahlung respecitvely. The model uses Metropolis MCMC algorithm to measure how much the guess combination of irradiance deviates from the passed-in/given irradiance. The deviation between these curves is what allows the algorithm to decide whether to accept the draw or not. 
+Takes in a prior belief for parameter $$theta$$, whose likelihood is presented to be P($$theta$$). The model takes this prior, in this case temperture, and calculates the irradiance using the Planck's law for the guess temperture of the Blackbody and Bremsstrahlung equation for the guess temperature of the Bremsstrahlung respecitvely. The model uses Metropolis MCMC algorithm to measure how much the guess combination of irradiance deviates from the passed-in/given irradiance. The deviation between these curves is what allows the algorithm to set the degree to which it should accept the draw as a sample. MCMC's role in the process of generating samples using prior data. Thereby, the next draw will be sampled from the normalization distribution of the last accepted sample. Like so, the algorithm will draw samples for 4 independent chains, with 2000 draws, and a thousand burn-ins.
 
 
 
