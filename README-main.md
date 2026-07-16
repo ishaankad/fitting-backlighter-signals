@@ -1,11 +1,11 @@
 Note: all is to be updated with more code progress
 
-# Overview
+## Overview
 
 My model estimates temperature and other properties of the hohlraum/blackbody in an inertial confinement fusion. The model uses Metropolis MCMC algorithm to estimate these properties given synthetically generated 'measured data'.
 
 
-# Introduction 
+## Introduction 
 
 What is an Inertial Confinement Fusion?
 
@@ -18,12 +18,14 @@ The spectrometer also recieves a significant amount of non-blackbody radiation, 
 We segregate the two radiations to derive properties from each of them by using prior knowledge of which intensities these radiations occur at. In this model, such knowledge can be derived from Planck's law for blackbody radiation and bremsstrahlung radiation. Planck's law shows how much energy is emitted by a blackbody, given a temperature. 
 
 
-# Physics Model
+## Physics Model
 
+
+Planck's law for measuring Blackbody Radiation:
 $$B(\nu, T) = \frac{2h\nu^3}{c^2 \left(e^{\frac{h\nu}{k_B T}} - 1\right)}$$
 
-
-
+Thermal Bremsstrahlung Equation:
+$$I(\nu) = \frac{A \cdot 2h\nu^3}{c^2} \cdot \frac{1}{e^{\frac{h\nu}{k_B T}}}$$
 
 
 
