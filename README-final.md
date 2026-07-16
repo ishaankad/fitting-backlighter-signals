@@ -20,6 +20,10 @@ We segregate the two radiations to derive properties from each of them by using 
 
 #Physics Model
 
+This equation $E = mc^2$ is written inline.
+
+
+
 
 
 
