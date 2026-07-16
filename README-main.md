@@ -21,13 +21,41 @@ We segregate the two radiations to derive properties from each of them by using 
 ## Physics Model
 
 
+
+
 Planck's law for measuring Blackbody Radiation:
+
+
+
 $$B(\nu, T) = \frac{2h\nu^3}{c^2 \left(e^{\frac{h\nu}{k_B T}} - 1\right)}$$
 
 Thermal Bremsstrahlung Equation:
+
+
+
 $$I(\nu) = \frac{A \cdot 2h\nu^3}{c^2} \cdot \frac{1}{e^{\frac{h\nu}{k_B T}}}$$
 
 
+## Bayesian Statistics
+
+Metropolis Markov Chain Monte Carlo:
+
+The ratio between the probability densities between the two creates a clean acceptance value $$alpha$$. Thereby, the chance of this draw being accepted or not becomes $$alpha$$.
+
+
+
+## Methodology
+
+Generating True Probability:
+
+I set true parameters, such as temperature, the value my model is to guess, in their appropriate ranges. The holhraum reaches millions of Kelvin, so it will be more convenient to look at Temperature in units of electronvolts, allowing for more readable values.
+
+After defining my variables and true parameters, I calculate irradiances of blackbody and bremsstrahlung radiations. I superpose both arrays across a range of photon energies, and pass it into py.Model()
+
+
+My model takes in this irradiance as "observed data". 
+
+Takes in a prior belief for parameter $$theta$$, whose likelihood is presented to be P($$theta$$). The model takes this prior, in this case temperture, and calculates the irradiance using the Planck's law for the guess temperture of the Blackbody and Bremsstrahlung equation for the guess temperature of the Bremsstrahlung respecitvely. The model uses Metropolis MCMC algorithm to measure how much the guess combination of irradiance deviates from the passed-in/given irradiance. The deviation between these curves is what allows the algorithm to decide whether to accept the draw or not. 
 
 
 
