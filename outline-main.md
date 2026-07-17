@@ -59,6 +59,20 @@ Takes in a prior belief for parameter $$theta$$, whose likelihood is presented t
 
 
 
+# Advancements I want to make:
+- Update the bremsstrahlung equation
+- Add noise to the observed data
+- Create a signal to noise ratio: signal(observed)/amplitude of the noise vs. Measurement of fit accurancy
+- Examples of fit accuracy: R^2 value or Difference between estimate and true value *pymc library
+- Rename variables
+- Play with temperature and other input parameters/come up with and test different scenarios and models
+- Indtroduce the dante noise/real
+- Chapters: pg. 48 9.132 (first e corresponds to electron charge), 9.134,
+- Interrelated variables:
+-  Z* = Average ionization (average of the ion charges)
+-  n_e = electron density (# of electrons per cm^3)
+-  n_i = ion density
+
 
 
 
