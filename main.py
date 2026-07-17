@@ -15,14 +15,15 @@ import matplotlib.pyplot as plt
 import pymc as pm
 #import pandas as pd
 import arviz as az
+import default_style
 
-T_true = 5000 #setting a true temperature units [K]
-T_true_brems = 1000 #setting a true temperature units [K]
+T_true = 150*11604 #setting a true temperature units [K]
+T_true_brems = 100*11604 #setting a true temperature units [K]
 
 
 '''creating planckian synthetic data'''
 
-given_PE = np.linspace(.1,5,num=1000) #units [eV]
+given_PE = np.linspace(1,2000,num=1000) #units [eV]
 
 #variables
 #B = intensity units [W * sr^-1 * m^-2 * Hz^-1]
@@ -40,7 +41,7 @@ def synthetic_planckian(photon_energy_ev, T):
     den = np.exp(frac)-1
     return num/den
 
-def synthetic_brems(photon_energy_ev, T, A):
+def synthetic_brems(photon_energy_ev, T, A): # change formula
     photon_energy_j = photon_energy_ev * 1.602e-19
     freq = photon_energy_j / h
     num = (A * 2 * h * (freq**3)) / (c**2)
@@ -51,7 +52,26 @@ def synthetic_brems(photon_energy_ev, T, A):
 Data_true = synthetic_planckian(given_PE, T_true)
 Data_true_brems = synthetic_brems(given_PE, T_true_brems, A)
 
+
+
+
+
 observed_data = Data_true + Data_true_brems
+#%%
+plt.plot(given_PE, observed_data, label="total")
+plt.plot(given_PE, Data_true, label="Blackbody")
+plt.plot(given_PE, Data_true_brems, label="Brems")
+
+
+
+plt.xlabel("Photon Energy (eV)")
+plt.ylabel("Irradiance ()")
+plt.legend(frameon=False)
+plt.show()
+#%%
+
+
+
 
 '''creating prediction model'''
 if __name__ == '__main__': #prevents cores from reading whole file
@@ -60,11 +80,11 @@ if __name__ == '__main__': #prevents cores from reading whole file
         x = given_PE
         y = observed_data
         
-        T_guess = 4000 #K
-        T_guess_brems = 700 #K
+        T_guess = 100*11604 #K
+        T_guess_brems = 80*11604 #K
         
-        T_dist = pm.Normal('T', mu=T_guess, sigma=1000)
-        T_dist_brems = pm.Normal('T_brems', mu=T_guess_brems, sigma=200)
+        T_dist = pm.Normal('T', mu=T_guess, sigma=50*11604)
+        T_dist_brems = pm.Normal('T_brems', mu=T_guess_brems, sigma=20*11604)
         A_dist = pm.HalfNormal('A', sigma=1)
         
         model = synthetic_planckian(x,T_dist)
@@ -84,14 +104,43 @@ if __name__ == '__main__': #prevents cores from reading whole file
         
         #derives properties from metropolis
         data_mc = pm.to_inference_data(trace) #predicted probability distribution
-        print(az.summary(data_mc, round_to=4)) #prints out prediction of true temp
+        df = az.summary(data_mc, round_to=4) #prints out prediction of true temp
+        print(df)
         az.plot_trace(data_mc) #plots the distribution of data_mc
         
     
     plt.plot(given_PE, Data_true,color='pink') #true
     plt.show()
 
+#%% Title
+estimate_bb_temp = float(df["mean"].loc["T"])
+estimate_br_temp = float(df["mean"].loc["T_brems"])
+estimate_br_A = float(df["mean"].loc["A"])
+blackbody_fit = synthetic_planckian(given_PE, estimate_bb_temp)
+brems_fit = synthetic_brems(given_PE, estimate_br_temp, estimate_br_A)
+total_fit = blackbody_fit + brems_fit
 
+plt.scatter(given_PE, observed_data,c="C0",s=1, label="total")
+plt.plot(given_PE, total_fit,c="C0",ls="--", label="fit_total")
+
+
+plt.scatter(given_PE, Data_true,c="C1" ,s=1,label=f"Blackbody T={T_true/11604:.0f} eV")
+plt.plot(given_PE, blackbody_fit,c="C1",ls="--", label=f"fit_blackbody T={estimate_bb_temp/11604:.0f} eV")
+
+
+plt.scatter(given_PE, Data_true_brems,c="C2",s=1, label=f"Brems T={T_true_brems/11604:.0f} eV")
+plt.plot(given_PE, brems_fit,c="C2",ls="--", label=f"fit_brems T={estimate_br_temp/11604:.0f} eV")
+
+
+plt.xlabel("Photon Energy (eV)")
+plt.ylabel("Irradiance ()")
+plt.legend(frameon=False)
+plt.show()
+
+
+
+
+#%%
 
 
 
