@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import pymc as pm
 #import pandas as pd
 import arviz as az
-import default_style
+#import default_style
 
 T_true = 150*11604 #setting a true temperature units [K]
 T_true_brems = 100*11604 #setting a true temperature units [K]
@@ -100,7 +100,7 @@ if __name__ == '__main__': #prevents cores from reading whole file
         step_noise = pm.Metropolis(vars=[noise])
         step_A = pm.Metropolis(vars=[A_dist])
         
-        trace = pm.sample(draws=2000, tune=1000, chains=4, step=[step_T,step_T_brems,step_A,step_noise])
+        trace = pm.sample(draws=2000, tune=1000, chains=4,cores=1, step=[step_T,step_T_brems,step_A,step_noise])
         
         #derives properties from metropolis
         data_mc = pm.to_inference_data(trace) #predicted probability distribution
@@ -112,7 +112,7 @@ if __name__ == '__main__': #prevents cores from reading whole file
     plt.plot(given_PE, Data_true,color='pink') #true
     plt.show()
 
-#%% Title
+# # #%% Title
 estimate_bb_temp = float(df["mean"].loc["T"])
 estimate_br_temp = float(df["mean"].loc["T_brems"])
 estimate_br_A = float(df["mean"].loc["A"])
