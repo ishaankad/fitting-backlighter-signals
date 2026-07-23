@@ -16,31 +16,18 @@ import pymc as pm
 import arviz as az
 #import default_style
 
-T_true = 150*11604 #setting a true temperature units [K]
-T_true_brems = 100*11604 #setting a true temperature units [K]
+T_true = 150*11604 # [K]
+T_true_brems = 100*11604 # [K]
 
 
 '''creating planckian synthetic data'''
 
-given_PE = np.linspace(1,2000,num=1000) #units [eV]
+given_PE = np.linspace(1,2000,num=1000) # [eV]
 
 #VARIABLES
-#B = intensity units [W * sr^-1 * m^-2 * Hz^-1]
-h = 6.63e-34 #units [J * s]
-c = 3.00e8 #units [m * s^-1]
-k_b = 1.38e-23 #units [J * K^-1]
-
-#specific for Bremss
-perm = 8.85e-12 #permitivity [F * J^-1]
-q = 1.60e-19 #electron charge [C]
-m_e = 9.11e-31 #electron mass [kg]
-Z = 1 #average ionization is +1; full ionized Hydrogen ions in D-T fuel []
-n_e = 3e+32 #electron density n_e = (Z*)(n_i) if Z* is +1, n_e = n_i; [m^-3] #adjusting val to see curve
-n_i = n_e/Z #ion density [m^-3]
-I_h = 2.18e-18 #Hydrogen ionization energy [J]
-D = 1 # 0.6 - 5 meters [m]
-V = 6.28e-12 #[m^3] #adjusting val to see curve
-
+h = 6.63e-34 # [J * s]
+c = 3.00e8 # [m * s^-1]
+k_b = 1.38e-23 # [J * K^-1]
 
 def synthetic_planckian(photon_energy_ev, T):
     #converting photon energy to frequency
@@ -60,17 +47,28 @@ def synthetic_planckian(photon_energy_ev, T):
 #%%
 
 def synthetic_brems(photon_energy_ev, T): # change formula
-    photon_energy_j = photon_energy_ev * 1.602e-19
-    freq = photon_energy_j / h
+    k_b_erg = 1.380649e-16  # erg/K
+    m_e = 9.11e-28 #[g]
+    c = 2.99e10 #[cm/sec]
+    e_c = 4.80e-10 #[statC or esu]
+    Z = 1 #VARY THIS VAL
+    n_e = 1e21 #[cm^-3] VARY THIS VAL
+    n_i = n_e/Z #[cm^-3] 
+    E_p = photon_energy_ev/(6.24e11) #[erg]
+    E_t = k_b_erg * T #[erg]
+    I_h = 2.18e-11 #[erg]
+    V = 1e3 #[cm^3] DOUBLE CHECK
+    D = 100 #[cm] DOUBLE CHECK
     
-    coulomb_factor = ((q**2) / (4 * np.pi * perm)) ** 3
     term1 = (8/3)*(((2*np.pi) / (3*m_e*k_b*T)) ** 0.5)
-    term2 = (coulomb_factor) / (m_e * (c**3))
+    term2 = (e_c**6) / (m_e * (c**3))
     term3 = (Z**2)*n_e*n_i
-    term4 = np.exp((-h * freq) / (k_b * T))
-    gaunt_factor = 1 + (0.1728) * (((h * freq)/(I_h * (Z**2))) ** (1/3)) * (1 + ((2 * k_b * T) / (h * freq)))
+    term4 = np.exp(-E_p / E_t)
+    gaunt_factor = 1 + (0.1728) * (((E_p)/(I_h * (Z**2))) ** (1/3)) * (1 + ((2 * E_t) / (E_p)))
     j = (term1 * term2 * term3 * term4 * gaunt_factor)
-    return (j*V)/(D**2)
+    irr_cgs = (j*V)/(D**2)
+    irr_si = irr_cgs*1e-3
+    return irr_si
  
 Data_true = synthetic_planckian(given_PE, T_true)
 Data_true_brems = synthetic_brems(given_PE, T_true_brems)
@@ -78,21 +76,17 @@ Data_true_brems = synthetic_brems(given_PE, T_true_brems)
 
 #%%
 
-
 observed_data = Data_true + Data_true_brems
-# #%%
-plt.plot(given_PE, observed_data, label="total")
-plt.plot(given_PE, Data_true, label="Blackbody")
-plt.plot(given_PE, Data_true_brems, label="Brems")
 
+# plt.plot(given_PE, observed_data, label="total")
+# plt.plot(given_PE, Data_true, label="Blackbody")
+# plt.plot(given_PE, Data_true_brems, label="Brems")
 
-
-plt.xlabel("Photon Energy (eV)")
-plt.ylabel("Irradiance ()")
-plt.legend(frameon=False)
-plt.show()
+# plt.xlabel("Photon Energy (eV)")
+# plt.ylabel("Irradiance ()")
+# plt.legend(frameon=False)
+# plt.show()
 #%%
-
 
 
 if __name__ == '__main__':
