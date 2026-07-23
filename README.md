@@ -10,13 +10,12 @@ Terminal commands for Linux OS
 ### 1. Clone Repo & Set-up:
 ```
 git clone https://github.com/ishaankad/fitting-backlighter-signals.git
-cd fitting-backlighter-signals
 ```
 
 ### 2. Package Installation via Miniconda:
 Conda package manager will be used in installing python libraries via Miniconda bootstrap installer. Libraries: `numpy`, `pandas`, `pymc`, `arviz`, `matplot`. Installing these libraries in a python virtual environment is recommended in preventing system-level dependency conflicts. 
 ```
-mkdir -p ~/miniconda3
+mkdir -p ~/miniconda3 && cd "$_"
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 ```
 ```
@@ -25,11 +24,18 @@ rm -rf ~/miniconda3/miniconda.sh
 ```
 ```
 ~/miniconda3/bin/conda init bash
+source ~/miniconda3/bin/activate
 ```
 Creating virtual env and installing packages:
 ```
 conda create -c conda-forge -n planck-env pymc matplotlib numpy pandas arviz -y
 ```
+Accept terms of service:
+```
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+```
+Re-run previous command `conda create...`
 
 Instructions to activate Conda env:
 ```
@@ -37,6 +43,7 @@ conda activate fitting-planckian-env
 ```
 ### 3. Run the model:
 ```
+cd Documents/fitting-backlighter-signals/
 python3 main.py
 ```
 
