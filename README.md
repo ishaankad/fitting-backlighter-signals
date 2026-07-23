@@ -27,24 +27,22 @@ rm -rf ~/miniconda3/miniconda.sh
 source ~/miniconda3/bin/activate
 ~/miniconda3/bin/conda init bash
 ```
-Creating virtual env and installing packages:
-```
-conda create -c conda-forge -n planck-env pymc matplotlib numpy pandas arviz -y
-```
 Accept terms of service:
 ```
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 ```
-Re-run previous command `conda create...`
-
+Creating virtual env and installing packages:
+```
+conda create -c conda-forge -n planck-env pymc matplotlib numpy pandas arviz -y
+```
 Instructions to activate Conda env:
 ```
 conda activate fitting-planckian-env
 ```
 ### 3. Run the model:
 ```
-cd Documents/fitting-backlighter-signals/
+cd fitting-backlighter-signals/
 python3 main.py
 ```
 
