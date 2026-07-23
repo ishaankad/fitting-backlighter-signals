@@ -34,7 +34,7 @@ conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 ```
 Creating virtual env and installing packages:
 ```
-conda create -c conda-forge -n planck-env pymc matplotlib numpy pandas arviz -y
+conda create -c conda-forge -n fitting-planckian-env pymc matplotlib numpy pandas arviz -y
 ```
 Instructions to activate Conda env:
 ```
