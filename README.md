@@ -23,7 +23,7 @@ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 # Once you run the .sh file, it is no longer needed
 rm -rf ~/miniconda3/miniconda.sh
 ```
-Switch to the default virtual env of Conda package manager
+Switch to the default virtual env of Conda package manager:
 ```
 source ~/miniconda3/bin/activate
 ~/miniconda3/bin/conda init bash
