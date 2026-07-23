@@ -37,7 +37,7 @@ conda activate fitting-planckian-env
 ```
 ### 3. Run the model:
 ```
-python fitting_planckian.py
+python3 main.py
 ```
 
 
