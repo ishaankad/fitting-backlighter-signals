@@ -1,20 +1,38 @@
-# fitting-backlighter-signals
-Project aimed at fitting (blackbody and bremsstrahlung) radiation from a backlighter receiver in an inertial confinement fusion (ICF) using Bayesian Statistics
+# Estimation of the internal properties of a Hohlraum in an Inertial Confinement Fusion 
 
-## testing_temps_spectra.py
-06/05 This file takes in different temperatures at fits it onto a Planckian curve as a blackbody spectra
+By Isha Ankad and Pawel Kozlowski
+Institute of Computing in Research
 
-## fitting_planckian_diff_temps.png
-06/05 result of the testing_temps_spectra
+Objective: This project is aimed at creating a model that can estimate the internal properties of a hohlraum (or blackbody) in an inertial confinement fusion. By using data collected from an x-ray spectrometer, the model is able to separate and fit a mixed signal, consisting of blackbody and bremsstrahlung radiation (noise), and estimate its properties using MCMC algorithms.  
 
-## estimate_sun_temp.py
-06/09 Estimating the sun's temperature using spectrocopic data
+# How to Start:
 
-## sun_power_model.png
-06/09 Plotting the sun at a certain distance from a blackbody according to exhibited power
+#1 Clone Repo & Set-up:
+`git clone https://github.com/ishaankad/fitting-backlighter-signals.git
+cd fitting-backlighter-signals`
 
-## correct_fitting_planckian_diff.png
-06/09 Corrected the units for the fitting_planckian_diff_temp.py file
+#2 Package Installation via Miniconda:
+Conda package manager will be used in installing python libraries via Miniconda bootstrap installer. Libraries: `numpy`, `pandas`, `pymc`, `arviz`, `matplot`. Installing these libraries in a python virtual environment is recommended in preventing system-level dependency conflicts. 
+`wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+bash miniconda.sh -b -p $HOME/miniconda
+rm miniconda.sh`
 
-## uv_xray_sum.png
-06/25 Plotting the superposition of xray and uv rays
+`$HOME/miniconda/bin/conda init bash
+source ~/.bashrc`
+
+`# creating virtual env and installing packages
+conda create -c conda-forge -n planck-env pymc matplotlib numpy pandas arviz -y`
+
+Instructions to activate Conda env:
+`conda activate fitting-planckian-env`
+
+# Run the model:
+`python fitting_planckian.py`
+
+
+
+
+
+
+
+
