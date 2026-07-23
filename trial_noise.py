@@ -6,7 +6,7 @@ Created on Tue Jul 14 11:49:44 2026
 @author: isha
 """
 
-"""Goal: Derive true temperatures from bremsstrahlung and blackbody radiation recieved by an icf spectrographic device"""
+"""Goal: Add noise to the model + Implement tests to see how noise changes sampling"""
 
 #importing all the libs
 import numpy as np
