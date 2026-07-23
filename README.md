@@ -24,8 +24,8 @@ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 rm -rf ~/miniconda3/miniconda.sh
 ```
 ```
-~/miniconda3/bin/conda init bash
 source ~/miniconda3/bin/activate
+~/miniconda3/bin/conda init bash
 ```
 Creating virtual env and installing packages:
 ```
