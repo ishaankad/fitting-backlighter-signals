@@ -93,6 +93,7 @@ observed_data = Data_true + Data_true_brems
 # plt.show()
 #%%
 snr_levels = np.arange(5, 31, 5) 
+
 signal_power = np.mean(observed_data ** 2)
 r2_vals = []
 mse_vals = []
@@ -162,13 +163,16 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 
 r2_vals = np.log(np.abs(r2_vals))
 ax1.plot(snr_levels, r2_vals)
+ax1.set_xlabel("Signal:Noise Ratio")
+ax1.set_ylabel("R^2 Values")
 ax1.set_title("R^2 values over varying noise")
 
 ax2.plot(snr_levels, mse_vals)
+ax2.set_xlabel("Signal:Noise Ratio")
+ax2.set_ylabel("MSE Values")
 ax2.set_title("MSE values over varying noise")
 plt.tight_layout()
 plt.show()
-
 plt.scatter(given_PE, observed_data,c="C0",s=1, label="total")
 plt.plot(given_PE, total_fit,c="C0",ls="--", label="fit_total")
 
