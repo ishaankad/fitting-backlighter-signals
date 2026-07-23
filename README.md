@@ -5,7 +5,7 @@ Institute of Computing in Research
 
 Objective: This project is aimed at creating a model that can estimate the internal properties of a hohlraum (or blackbody) in an inertial confinement fusion. By using data collected from an x-ray spectrometer, the model is able to separate and fit a mixed signal, consisting of blackbody and bremsstrahlung radiation (noise), and estimate its properties using MCMC algorithms.  
 
-# How to Start:
+## How to Start:
 
 #1 Clone Repo & Set-up:
 ```
@@ -35,7 +35,7 @@ Instructions to activate Conda env:
 ```
 conda activate fitting-planckian-env
 ```
-# Run the model:
+## Run the model:
 ```
 python fitting_planckian.py
 ```
