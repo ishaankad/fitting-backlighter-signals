@@ -7,13 +7,13 @@ Objective: This project is aimed at creating a model that can estimate the inter
 
 ## How to Start:
 
-#1 Clone Repo & Set-up:
+### 1. Clone Repo & Set-up:
 ```
 git clone https://github.com/ishaankad/fitting-backlighter-signals.git
 cd fitting-backlighter-signals
 ```
 
-#2 Package Installation via Miniconda:
+### 2. Package Installation via Miniconda:
 Conda package manager will be used in installing python libraries via Miniconda bootstrap installer. Libraries: `numpy`, `pandas`, `pymc`, `arviz`, `matplot`. Installing these libraries in a python virtual environment is recommended in preventing system-level dependency conflicts. 
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -35,7 +35,7 @@ Instructions to activate Conda env:
 ```
 conda activate fitting-planckian-env
 ```
-## Run the model:
+### 3. Run the model:
 ```
 python fitting_planckian.py
 ```
