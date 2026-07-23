@@ -20,6 +20,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O mi
 ```
 ```
 bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+# Once you run the .sh file, it is no longer needed
 rm -rf ~/miniconda3/miniconda.sh
 ```
 ```
