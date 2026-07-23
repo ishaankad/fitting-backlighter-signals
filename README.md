@@ -1,6 +1,7 @@
 # Estimation of the internal properties of a Hohlraum in an Inertial Confinement Fusion 
 
 By Isha Ankad and Pawel Kozlowski
+
 Institute of Computing in Research
 
 Objective: This project is aimed at creating a model that can estimate the internal properties of a hohlraum (or blackbody) in an inertial confinement fusion. By using data collected from an x-ray spectrometer, the model is able to separate and fit a mixed signal, consisting of blackbody and bremsstrahlung radiation (noise), and estimate its properties using MCMC algorithms.  
