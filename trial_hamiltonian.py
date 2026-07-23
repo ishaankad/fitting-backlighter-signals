@@ -16,8 +16,8 @@ import pymc as pm
 import arviz as az
 #import default_style
 
-T_true = 150*11604 # [K]
-T_true_brems = 100*11604 # [K]
+T_true = 150 # [eV]
+T_true_brems = 100 # [eV]
 
 
 '''creating planckian synthetic data'''
@@ -30,12 +30,13 @@ c = 3.00e8 # [m * s^-1]
 k_b = 1.38e-23 # [J * K^-1]
 
 def synthetic_planckian(photon_energy_ev, T):
+    T_K = T*11604 #[K]
     #converting photon energy to frequency
     photon_energy_j = photon_energy_ev * 1.602e-19
     freq = photon_energy_j / h
     
     num = (2 * h * (freq**3)) / (c**2)
-    e_power = (h * freq)/(k_b * T)
+    e_power = (h * freq)/(k_b * T_K)
     den = np.exp(e_power)-1
     
     return num/den
@@ -47,6 +48,7 @@ def synthetic_planckian(photon_energy_ev, T):
 #%%
 
 def synthetic_brems(photon_energy_ev, T): # change formula
+    T_K = T*11604 #[K]
     k_b_erg = 1.380649e-16  # erg/K
     m_e = 9.11e-28 #[g]
     c = 2.99e10 #[cm/sec]
@@ -55,7 +57,7 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     n_e = 1e21 #[cm^-3] VARY THIS VAL
     n_i = n_e/Z #[cm^-3] 
     E_p = photon_energy_ev/(6.24e11) #[erg]
-    E_t = k_b_erg * T #[erg]
+    E_t = k_b_erg * T_K #[erg]
     I_h = 2.18e-11 #[erg]
     V = 1e3 #[cm^3] DOUBLE CHECK
     D = 100 #[cm] DOUBLE CHECK
@@ -72,7 +74,6 @@ def synthetic_brems(photon_energy_ev, T): # change formula
  
 Data_true = synthetic_planckian(given_PE, T_true)
 Data_true_brems = synthetic_brems(given_PE, T_true_brems)
-
 
 #%%
 
@@ -97,11 +98,11 @@ if __name__ == '__main__':
         x = given_PE
         y = observed_data
         
-        T_guess = 100*11604 #K
-        T_guess_brems = 80*11604 #K
+        T_guess = 100 #[eV]
+        T_guess_brems = 80 #[eV]
         
-        T_dist = pm.Normal('T', mu=T_guess, sigma=50*11604)
-        T_dist_brems = pm.Normal('T_brems', mu=T_guess_brems, sigma=20*11604)
+        T_dist = pm.Normal('T', mu=T_guess, sigma=50)
+        T_dist_brems = pm.Normal('T_brems', mu=T_guess_brems, sigma=20)
         
         model = synthetic_planckian(x,T_dist)
         model_brems = synthetic_brems(x,T_dist_brems) 
@@ -137,11 +138,11 @@ if __name__ == '__main__':
     ax.scatter(given_PE, observed_data,c="C0",s=1, label="total")
     ax.plot(given_PE, total_fit,c="C0",ls="--", label="fit_total")
     
-    ax.scatter(given_PE, Data_true,c="C1" ,s=1,label=f"Blackbody T={T_true/11604:.0f} eV")
-    ax.plot(given_PE, blackbody_fit,c="C1",ls="--", label=f"fit_blackbody T={estimate_bb_temp/11604:.0f} eV")
+    ax.scatter(given_PE, Data_true,c="C1" ,s=1,label=f"Blackbody T={T_true:.0f} eV")
+    ax.plot(given_PE, blackbody_fit,c="C1",ls="--", label=f"fit_blackbody T={estimate_bb_temp:.0f} eV")
     
-    ax.scatter(given_PE, Data_true_brems,c="C2",s=1, label=f"Brems T={T_true_brems/11604:.0f} eV")
-    ax.plot(given_PE, brems_fit,c="C2",ls="--", label=f"fit_brems T={estimate_br_temp/11604:.0f} eV")
+    ax.scatter(given_PE, Data_true_brems,c="C2",s=1, label=f"Brems T={T_true_brems:.0f} eV")
+    ax.plot(given_PE, brems_fit,c="C2",ls="--", label=f"fit_brems T={estimate_br_temp:.0f} eV")
     
     
     ax.set_xlabel("Photon Energy (eV)")
