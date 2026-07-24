@@ -74,13 +74,22 @@ def synthetic_brems(photon_energy_ev, T): # change formula
 
 
 
-df = pd.read_csv('86459_time_0.1_spectrum.csv')
+df = pd.read_csv('86459_time_1.0_spectrum.csv')
+
+# df = pd.read_csv('86459_time_1.5_spectrum.csv')
+    
+# df = pd.read_csv('86459_time_2.0_spectrum.csv')
+
+
+
 print(df.columns.tolist())
 print(df.head())
 
 given_PE = df['Energy (eV)'].values
 power_GW = df['Spectrum (Gw/sr/eV)'].values
 
+power_GW = np.maximum(power_GW, 0.0)
+        
 #69 degrees
 area_h = np.pi * (0.6e-3)**2
 area_h * np.cos(np.radians(69))
