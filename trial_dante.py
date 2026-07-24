@@ -74,85 +74,84 @@ def synthetic_brems(photon_energy_ev, T): # change formula
 
 
 
-df = pd.read_csv('86459_time_1.0_spectrum.csv')
+#df = pd.read_csv('86459_time_2.0_spectrum.csv')
 
 # df = pd.read_csv('86459_time_1.5_spectrum.csv')
     
 # df = pd.read_csv('86459_time_2.0_spectrum.csv')
+    
+time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
+str(time_step)
 
+fig,ax = plt.subplots()
 
-
-print(df.columns.tolist())
-print(df.head())
-
-given_PE = df['Energy (eV)'].values
-power_GW = df['Spectrum (Gw/sr/eV)'].values
-
-power_GW = np.maximum(power_GW, 0.0)
+for time in time_step:
+    df = pd.read_csv(f'86459_time_{time}_spectrum.csv')
+    print(df.columns.tolist())
+    print(df.head())
+    
+    given_PE = df['Energy (eV)'].values
+    power_GW = df['Spectrum (Gw/sr/eV)'].values
+    
+    power_GW = np.maximum(power_GW, 0.0)
+            
+    #69 degrees
+    area_h = np.pi * (0.6e-3)**2
+    area_h * np.cos(np.radians(69))
+    power_W = power_GW * 1e9
+    
+    observed_data = np.pi * power_W / area_h
+    print(observed_data)
+    
+    ax.plot(given_PE, observed_data, label=f"{time} ns")
         
-#69 degrees
-area_h = np.pi * (0.6e-3)**2
-area_h * np.cos(np.radians(69))
-power_W = power_GW * 1e9
+    scale_coef = np.max(observed_data)
+    y_scaled = observed_data / scale_coef
+    if __name__ == '__main__':
+    
+        '''creating prediction model'''
+        with pm.Model() as Model:
+            # x = pos_PE
+            # y = y_scaled
+            mask = given_PE > 0.5   
+            x = given_PE[mask]
+            y = y_scaled[mask]
+            T_guess = 100 #[eV]
+            T_guess_brems = 170 #[eV]
+            
+            T_dist = pm.TruncatedNormal('T', mu=T_guess, sigma=50, lower=5)
+            T_dist_brems = pm.TruncatedNormal('T_brems', mu=T_guess_brems, sigma=20, lower=5)
+            
+            model = synthetic_planckian(x,T_dist)
+            model_brems = synthetic_brems(x,T_dist_brems) 
+            
+            model_both = model + model_brems
+            noise = pm.HalfNormal('noise', sigma=0.1) + 1e-5
+            model_both_scaled = model_both/scale_coef
+    
+            y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y) 
+            
+            
+            trace = pm.sample(draws=2000, tune=1000, chains=4, cores=1,target_accept=0.95)
+            
+            #derives properties from metropolis
+            data_mc = pm.to_inference_data(trace) #predicted probability distribution
+            df = az.summary(data_mc, round_to=4) #prints out prediction of true temp
+            print(df)
+            az.plot_trace(data_mc, combined=True)
+            plt.tight_layout()
+            plt.show() 
 
-observed_data = np.pi * power_W / area_h
-print(observed_data)
-
-plt.plot(given_PE, observed_data, label="dante")
-
-
-
-plt.xlabel("Photon Energy (eV)")
-plt.ylabel("Irradiance ()")
-plt.legend(frameon=False)
+ax.set_xlabel("Photon Energy (eV)")
+ax.set_ylabel("Irradiance ()")
+ax.legend(frameon=False)
 plt.show()
 
 
 #%%
 
-scale_coef = np.max(observed_data)
-y_scaled = observed_data / scale_coef
-if __name__ == '__main__':
 
-    '''creating prediction model'''
-    with pm.Model() as Model:
-        x = given_PE
-        y = y_scaled
-        
-        T_guess = 100 #[eV]
-        T_guess_brems = 170 #[eV]
-        
-        T_dist = pm.TruncatedNormal('T', mu=T_guess, sigma=50, lower=5)
-        T_dist_brems = pm.TruncatedNormal('T_brems', mu=T_guess_brems, sigma=20, lower=5)
-        
-        model = synthetic_planckian(x,T_dist)
-        model_brems = synthetic_brems(x,T_dist_brems) 
-        
-        model_both = model + model_brems
-        noise = pm.HalfNormal('noise', sigma=0.1) + 1e-5
-        model_both_scaled = model_both/scale_coef
-        # noise = pm.HalfNormal('noise', sigma=1e13) #accepts positive values around 0
-        y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y) 
-        
-        # step_T = pm.Metropolis(vars=[T_dist])
-        # step_T_brems = pm.Metropolis(vars=[T_dist_brems])        
-        # step_noise = pm.Metropolis(vars=[noise])
-        
-        trace = pm.sample(draws=2000, tune=1000, chains=4, cores=1,target_accept=0.95)
-        
-        #derives properties from metropolis
-        data_mc = pm.to_inference_data(trace) #predicted probability distribution
-        df = az.summary(data_mc, round_to=4) #prints out prediction of true temp
-        print(df)
-        az.plot_trace(data_mc, combined=True)
-        plt.tight_layout()
-        plt.show() 
     
-
-
-
-
-
 
 
 
