@@ -61,7 +61,7 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     term1 = (8/3)*(((2*np.pi) / (3*m_e*k_b*T)) ** 0.5)
     term2 = (e_c**6) / (m_e * (c**3))
     term3 = (Z**2)*n_e*n_i
-    term4 = pm.math.exp(-E_p / E_t)
+    term4 = np.exp(-E_p / E_t)
     gaunt_factor = 1 + (0.1728) * (((E_p)/(I_h * (Z**2))) ** (1/3)) * (1 + ((2 * E_t) / (E_p)))
     j = (term1 * term2 * term3 * term4 * gaunt_factor)
     irr_cgs = (j*V)/(D**2)
@@ -194,7 +194,17 @@ for time in time_step:
             compare_bb.append(estimate_bb_temp)
             compare_br.append(estimate_br_temp)
             print(f"ESTIMATED TEMP BLACKBODY: {estimate_bb_temp}\nESTIMATED TEMP BREMS: {estimate_br_temp}")
+            
+            model_fit = synthetic_planckian(x, estimate_bb_temp) + synthetic_brems(x, estimate_br_temp)
+            model_fit_scaled = (np.max(y)*0 + 1) * model_fit / np.max(model_fit)  
+            
+            plt.scatter(x, y, c="C0", s=1, label="total")
+            plt.plot(x, model_fit_scaled, c="C1", ls="--", label="fit_total")
 
+            plt.xlabel("Photon Energy (eV)")
+            plt.ylabel("Irradiance ()")
+            plt.legend(frameon=False)
+            plt.show()
 
 #%%
 

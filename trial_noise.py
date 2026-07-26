@@ -18,7 +18,7 @@ import arviz as az
 from sklearn.metrics import r2_score
 
 T_true = 150 # [eV]
-T_true_brems = 100 # [eV]
+T_true_brems = 200 # [eV]
 
 
 '''creating planckian synthetic data'''
@@ -39,8 +39,10 @@ def synthetic_planckian(photon_energy_ev, T):
     num = (2 * h * (freq**3)) / (c**2)
     e_power = (h * freq)/(k_b * T_K)
     den = np.exp(e_power)-1
-    
-    return num/den
+    V = 1e3
+    D = 1
+    B = ((num/den) * V)/(D**2)
+    return B
 
 
 '''Important note: i must convert the bremsstahlung data from emittivity to irradiance prior to plotting it '''
@@ -76,11 +78,14 @@ def synthetic_brems(photon_energy_ev, T): # change formula
 Data_true = synthetic_planckian(given_PE, T_true)
 Data_true_brems = synthetic_brems(given_PE, T_true_brems)
 
+
+
 #%%
 
 observed_data = Data_true + Data_true_brems
+# observed_data = np.genfromtxt('86459_dante_power.csv', delimiter=',', skip_header=1)
 
-#%%
+# #%%
 # plt.plot(given_PE, observed_data, label="total")
 # plt.plot(given_PE, Data_true, label="Blackbody")
 # plt.plot(given_PE, Data_true_brems, label="Brems")
@@ -92,8 +97,8 @@ observed_data = Data_true + Data_true_brems
 # plt.legend(frameon=False)
 # plt.show()
 #%%
-snr_levels = np.arange(5, 31, 5) 
-
+#snr_levels = np.arange(1, 30, step=6) 
+snr_levels = [30]
 signal_power = np.mean(observed_data ** 2)
 r2_vals = []
 mse_vals = []
@@ -115,7 +120,7 @@ if __name__ == '__main__':
             y = y_scaled
             
             T_guess = 100 #[eV]
-            T_guess_brems = 80 #[eV]
+            T_guess_brems = 170 #[eV]
             
             T_dist = pm.TruncatedNormal('T', mu=T_guess, sigma=50, lower=5)
             T_dist_brems = pm.TruncatedNormal('T_brems', mu=T_guess_brems, sigma=20, lower=5)
@@ -149,8 +154,8 @@ if __name__ == '__main__':
         blackbody_fit = synthetic_planckian(given_PE, estimate_bb_temp)
         brems_fit = synthetic_brems(given_PE, estimate_br_temp)
         total_fit = blackbody_fit + brems_fit
-
-
+        
+    
         post = az.extract(trace)
         r2 = r2_score(observed_data,total_fit)
         r2_vals.append(r2)
