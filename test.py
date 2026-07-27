@@ -16,6 +16,9 @@ import arviz as az
 #from sklearn.metrics import r2_score
 # from trial_noise import synthetic_planckian,synthetic_brems
 import pytensor.tensor as pt
+from arviz_base import load_arviz_data
+import arviz_plots as azp
+
 
 #%%
 
@@ -195,15 +198,37 @@ for time in time_step:
             compare_br.append(estimate_br_temp)
             print(f"ESTIMATED TEMP BLACKBODY: {estimate_bb_temp}\nESTIMATED TEMP BREMS: {estimate_br_temp}")
             
-            model_fit = synthetic_planckian(x, estimate_bb_temp) + synthetic_brems(x, estimate_br_temp)
-            model_fit_scaled = (np.max(y)*0 + 1) * model_fit / np.max(model_fit)  
+            total_fit = synthetic_planckian(x, estimate_bb_temp) + synthetic_brems(x, estimate_br_temp)
+            total_fit_scaled = (np.max(y)*0 + 1) * total_fit / np.max(total_fit)  
+            bb_fit = synthetic_planckian(x, estimate_bb_temp) 
+            bb_fit_scaled = (np.max(y)*0 + 1) * bb_fit / np.max(bb_fit)  
+            br_fit = synthetic_brems(x, estimate_br_temp)
+            br_fit_scaled = (np.max(y)*0 + 1) * br_fit / np.max(br_fit)  
             
             plt.scatter(x, y, c="C0", s=1, label="total")
-            plt.plot(x, model_fit_scaled, c="C1", ls="--", label="fit_total")
+
+            plt.plot(x, total_fit_scaled, c="C0", ls="--", label="total")
+
+            plt.plot(x, bb_fit_scaled, c="C1", ls="--", label="blackbody")
+            
+            plt.plot(x, br_fit_scaled, c="C2", ls="--", label="bremsstrahlung")
+
 
             plt.xlabel("Photon Energy (eV)")
-            plt.ylabel("Irradiance ()")
+            plt.ylabel("Irradiance (W*m^2)")
             plt.legend(frameon=False)
+            plt.show()
+            
+            
+
+            pc = azp.plot_dist(
+                data_mc,
+                kind="dot",
+                var_names=["T", "T_brems"],
+                visuals={"point_estimate_text": False},
+                stats={"dist": {"nquantiles": 200}},
+                backend="matplotlib",
+            )
             plt.show()
 
 #%%
