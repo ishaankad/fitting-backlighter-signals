@@ -1,0 +1,12 @@
+[project]
+name = "fitting-backlighter-signals"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "pymc>=5.28",
+    "arviz>=0.23",
+    "numpy>=2.4",
+    "scipy>=1.17",
+    "pandas>=3.0",
+    "matplotlib>=3.10",
+]
