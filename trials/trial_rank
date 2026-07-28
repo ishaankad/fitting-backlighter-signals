@@ -70,38 +70,7 @@ def synthetic_brems(photon_energy_ev, T): # change formula
  
 
 #%%
-time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
-fig,ax = plt.subplots()
 
-for time in time_step:
-    df = pd.read_csv(f'86459_time_{time}_spectrum.csv')
-    # print(df.columns.tolist())
-    # print(df.head())
-    
-    given_PE = df['Energy (eV)'].values
-    power_GW = df['Spectrum (Gw/sr/eV)'].values
-    
-    power_GW = np.maximum(power_GW, 0.0)
-            
-    #69 degrees
-    area_h = np.pi * (0.6e-3)**2
-    # area_h * np.cos(np.radians(69))
-    power_W = power_GW * 1e9
-    
-    observed_data = np.pi * power_W / area_h
-    print(observed_data)
-
-    ax.plot(given_PE, observed_data, label=f"{time} ns")
-
-
-ax.set_xlabel("Photon Energy (eV)")
-ax.set_ylabel("Irradiance ()")
-ax.legend(frameon=False)
-plt.show()
-
-
-
-#%%
 
 
 #df = pd.read_csv('86459_time_2.0_spectrum.csv')
@@ -113,15 +82,12 @@ plt.show()
 time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
 # str(time_step)
 
-
-compare_bb = []
-compare_br = []
-
+fig,ax = plt.subplots()
 
 for time in time_step:
     df = pd.read_csv(f'86459_time_{time}_spectrum.csv')
-    # print(df.columns.tolist())
-    # print(df.head())
+    print(df.columns.tolist())
+    print(df.head())
     
     given_PE = df['Energy (eV)'].values
     power_GW = df['Spectrum (Gw/sr/eV)'].values
@@ -136,6 +102,7 @@ for time in time_step:
     observed_data = np.pi * power_W / area_h
     print(observed_data)
     
+    ax.plot(given_PE, observed_data, label=f"{time} ns")
         
     scale_coef = np.max(observed_data)
     y_scaled = observed_data / scale_coef
@@ -179,38 +146,25 @@ for time in time_step:
             y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y) 
             
             
-            rank = pm.sample(draws=2000, tune=1000, chains=4, cores=1,target_accept=0.95)
+            trace = pm.sample(draws=2000, tune=1000, chains=4, cores=1,target_accept=0.95)
             
             #derives properties from metropolis
-            data_mc = pm.to_inference_data(rank) #predicted probability distribution
+            data_mc = pm.to_inference_data(trace) #predicted probability distribution
             df = az.summary(data_mc, round_to=4) #prints out prediction of true temp
             print(df)
-            az.plot_rank(data_mc, var_names=['T', 'T_brems', 'noise'])
+            az.plot_trace(data_mc, combined=True)
             plt.tight_layout()
             plt.show() 
-            estimate_bb_temp = float(df["mean"].loc["T"])
-            estimate_br_temp = float(df["mean"].loc["T_brems"])
-            
-            compare_bb.append(estimate_bb_temp)
-            compare_br.append(estimate_br_temp)
-            print(f"ESTIMATED TEMP BLACKBODY: {estimate_bb_temp}\nESTIMATED TEMP BREMS: {estimate_br_temp}")
+
+ax.set_xlabel("Photon Energy (eV)")
+ax.set_ylabel("Irradiance ()")
+ax.legend(frameon=False)
+plt.show()
 
 
 #%%
 
-plt.scatter(time_step,compare_bb)
-plt.xlabel("Time step (ns)")
-plt.ylabel("Blackbody Temp (eV)")
-plt.tight_layout()
-plt.show()
 
-
-plt.scatter(time_step,compare_br)
-plt.xlabel("Time step (ns)")
-plt.ylabel("Bremsstrahlung Temp (eV)")
-
-plt.tight_layout()
-plt.show()
     
 
 
