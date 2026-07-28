@@ -18,7 +18,7 @@ import arviz as az
 import pytensor.tensor as pt
 from arviz_base import load_arviz_data
 import arviz_plots as azp
-
+import os
 
 #%%
 
@@ -77,7 +77,8 @@ time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
 fig,ax = plt.subplots()
 
 for time in time_step:
-    df = pd.read_csv(f'86459_time_{time}_spectrum.csv')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(script_dir, 'dante', f'86459_time_{time}_spectrum.csv'))
     # print(df.columns.tolist())
     # print(df.head())
     
@@ -122,7 +123,7 @@ compare_br = []
 
 
 for time in time_step:
-    df = pd.read_csv(f'86459_time_{time}_spectrum.csv')
+    df = pd.read_csv(f'dante/86459_time_{time}_spectrum.csv')
     # print(df.columns.tolist())
     # print(df.head())
     
@@ -196,6 +197,7 @@ for time in time_step:
             
             compare_bb.append(estimate_bb_temp)
             compare_br.append(estimate_br_temp)
+
             print(f"ESTIMATED TEMP BLACKBODY: {estimate_bb_temp}\nESTIMATED TEMP BREMS: {estimate_br_temp}")
             
             total_fit = synthetic_planckian(x, estimate_bb_temp) + synthetic_brems(x, estimate_br_temp)
@@ -205,6 +207,9 @@ for time in time_step:
             br_fit = synthetic_brems(x, estimate_br_temp)
             br_fit_scaled = (np.max(y)*0 + 1) * br_fit / np.max(br_fit)  
             
+            hdi_vals = az.hdi(data_mc, var_names=["T", "T_brems"], hdi_prob=0.94)
+            print(hdi_vals)
+
             plt.scatter(x, y, c="C0", s=1, label="total")
 
             plt.plot(x, total_fit_scaled, c="C0", ls="--", label="total")
@@ -218,6 +223,7 @@ for time in time_step:
             plt.ylabel("Irradiance (W*m^2)")
             plt.legend(frameon=False)
             plt.show()
+            
             
             
 
