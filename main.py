@@ -60,7 +60,9 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     I_h = 2.18e-11 #[erg]
     V = 1e3 #[cm^3] DOUBLE CHECK
     D = 100 #[cm] DOUBLE CHECK
+# %%
     
+
     term1 = (8/3)*(((2*np.pi) / (3*m_e*k_b*T)) ** 0.5)
     term2 = (e_c**6) / (m_e * (c**3))
     term3 = (Z**2)*n_e*n_i
@@ -73,12 +75,12 @@ def synthetic_brems(photon_energy_ev, T): # change formula
  
 
 #%%
-time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
+time_step = [1.0,2.0,3.0,4.0]
 fig,ax = plt.subplots()
 
 for time in time_step:
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    df = pd.read_csv(os.path.join(script_dir, 'dante', f'86459_time_{time}_spectrum.csv'))
+    df = pd.read_csv(os.path.join(script_dir, 'dante_pchip', f'86455_time_{time}_spectrum.csv'))
     # print(df.columns.tolist())
     # print(df.head())
     
@@ -99,7 +101,7 @@ for time in time_step:
 
 
 ax.set_xlabel("Photon Energy (eV)")
-ax.set_ylabel("Irradiance ()")
+ax.set_ylabel("Irradiance (W*m^2)")
 ax.legend(frameon=False)
 plt.show()
 
@@ -114,7 +116,7 @@ plt.show()
     
 # df = pd.read_csv('86459_time_2.0_spectrum.csv')
     
-time_step = [1.0,1.5,2.0,2.5,3.0,3.5]
+time_step = [1.0,2.0,3.0]
 # str(time_step)
 
 
@@ -158,69 +160,95 @@ for time in time_step:
             # print("model magnitude:", np.max(test_model), np.min(test_model))
             # print("data magnitude (unscaled):", np.max(observed_data), np.min(observed_data))
                         
-            T_guess = 100 #[eV]
-            T_guess_brems = 170 #[eV]
+            T_guess = 150 #[eV]
+            T_guess_brems = 300 #[eV]
             
             # T_dist = pm.TruncatedNormal('T', mu=T_guess, sigma=50, lower=5)
             # T_dist_brems = pm.TruncatedNormal('T_brems', mu=T_guess_brems, sigma=20, lower=5)
             
-            log_T = pm.Normal('log_T', mu=np.log(T_guess), sigma=0.7)
-            T_dist = pm.Deterministic('T', pm.math.exp(log_T))
+            log_T = pm.Normal('log_T', mu=np.log(T_guess), sigma=80)
+            T_dist = pm.Deterministic('Blackbody_Temp', pm.math.exp(log_T))
             
-            log_T_brems = pm.Normal('log_T_brems', mu=np.log(T_guess_brems), sigma=0.5)
-            T_dist_brems = pm.Deterministic('T_brems', pm.math.exp(log_T_brems))
+            # log_T_brems = pm.Normal('log_T_brems', mu=np.log(T_guess_brems), sigma=200) #Uniform
+            log_T_brems = pm.Uniform('log_T_brems', lower=100, upper=600)
+            T_dist_brems = pm.Deterministic('Brems_Temp', pm.math.exp(log_T_brems))
             
-            log_amp = pm.Normal('log_amp', mu=0, sigma=10)
-            amp = pm.math.exp(log_amp)
+            # log_amp = pm.Normal('log_amp', mu=0, sigma=10)
+            # amp = pm.math.exp(log_amp)
+            
+            # log_amp_bb = pm.Uniform('log_amp_bb', lower=1, upper=10)
+            # amp_bb = pm.Deterministic('amp_bb', pm.math.exp(log_amp_bb))
+            
+            # log_amp_br = pm.Uniform('log_amp_br', lower=1, upper=10)
+            # amp_br = pm.Deterministic('amp_br', pm.math.exp(log_amp_br))
             
             model = synthetic_planckian(x,T_dist)
             model_brems = synthetic_brems(x,T_dist_brems) 
             
-            model_both = model + model_brems
-            noise = pm.HalfNormal('noise', sigma=0.1) + 1e-5
-            model_both_scaled = amp * model_both / pt.max(model_both)
+            model_bb_scaled = model / pt.max(model)
+            model_br_scaled = model_brems / pt.max(model_brems)
+
+                        
+            # model_bb_scaled = amp_bb * model / pt.max(model)
+            # model_br_scaled = amp_br * model_brems / pt.max(model_brems)
+            
+            model_both_scaled = model_bb_scaled + model_br_scaled
+            noise = pm.HalfNormal('noise', sigma=300) #???*
+            y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y)
+            
+            
+            # model_both = model + model_brems
+            # noise = pm.HalfNormal('noise', sigma=0.1) + 1e-5
+            # model_both_scaled = amp * model_both / pt.max(model_both)
     
-            y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y) 
+            # y_pred = pm.Normal('y_pred', mu=model_both_scaled, sigma=noise, observed=y) 
             
             
             rank = pm.sample(draws=2000, tune=1000, chains=4, cores=1,target_accept=0.95)
             
             #derives properties from metropolis
             data_mc = pm.to_inference_data(rank) #predicted probability distribution
-            df = az.summary(data_mc, round_to=4) #prints out prediction of true temp
+            df = az.summary(data_mc, round_to=4) #prints out prediction of tru*e temp
             print(df)
-            az.plot_rank(data_mc, var_names=['T', 'T_brems', 'noise'])
+            az.plot_rank(data_mc, var_names=['Blackbody_Temp', 'Brems_Temp', 'noise'])
             plt.tight_layout()
             plt.show() 
-            estimate_bb_temp = float(df["mean"].loc["T"])
-            estimate_br_temp = float(df["mean"].loc["T_brems"])
-            
+            estimate_bb_temp = float(df["mean"].loc["Blackbody_Temp"])
+            estimate_br_temp = float(df["mean"].loc["Brems_Temp"])
+            # estimate_amp_bb = float(df["mean"].loc["amp_bb"])
+            # estimate_amp_br = float(df["mean"].loc["amp_br"])
+
             compare_bb.append(estimate_bb_temp)
             compare_br.append(estimate_br_temp)
 
             print(f"ESTIMATED TEMP BLACKBODY: {estimate_bb_temp}\nESTIMATED TEMP BREMS: {estimate_br_temp}")
             
             total_fit = synthetic_planckian(x, estimate_bb_temp) + synthetic_brems(x, estimate_br_temp)
-            total_fit_scaled = (np.max(y)*0 + 1) * total_fit / np.max(total_fit)  
-            bb_fit = synthetic_planckian(x, estimate_bb_temp) 
-            bb_fit_scaled = (np.max(y)*0 + 1) * bb_fit / np.max(bb_fit)  
+            bb_fit = synthetic_planckian(x, estimate_bb_temp)
             br_fit = synthetic_brems(x, estimate_br_temp)
-            br_fit_scaled = (np.max(y)*0 + 1) * br_fit / np.max(br_fit)  
             
-            hdi_vals = az.hdi(data_mc, var_names=["T", "T_brems"], hdi_prob=0.94)
+            # bb_fit_scaled = estimate_amp_bb * bb_fit / np.max(bb_fit)
+            # br_fit_scaled = estimate_amp_br * br_fit / np.max(br_fit)
+            bb_fit_scaled =   bb_fit / np.max(bb_fit)
+            br_fit_scaled =   br_fit / np.max(br_fit)
+
+            total_fit_scaled = bb_fit_scaled + br_fit_scaled
+            
+            
+            hdi_vals = az.hdi(data_mc, var_names=["Blackbody_Temp", "Brems_Temp"], hdi_prob=0.94)
             print(hdi_vals)
 
-            plt.scatter(x, y, c="C0", s=1, label="total")
+            plt.scatter(x, y, c="C0", s=1, label="Total")
 
-            plt.plot(x, total_fit_scaled, c="C0", ls="--", label="total")
+            plt.plot(x, total_fit_scaled, c="C0", ls="--", label="Total Fit")
 
-            plt.plot(x, bb_fit_scaled, c="C1", ls="--", label="blackbody")
+            plt.plot(x, bb_fit_scaled, c="C1", ls="--", label="Blackbody Fit")
             
-            plt.plot(x, br_fit_scaled, c="C2", ls="--", label="bremsstrahlung")
+            plt.plot(x, br_fit_scaled, c="C2", ls="--", label="Brems Fit")
 
 
             plt.xlabel("Photon Energy (eV)")
-            plt.ylabel("Irradiance (W*m^2)")
+            plt.ylabel("Irradiance ")
             plt.legend(frameon=False)
             plt.show()
             
@@ -230,7 +258,7 @@ for time in time_step:
             pc = azp.plot_dist(
                 data_mc,
                 kind="dot",
-                var_names=["T", "T_brems"],
+                var_names=["Blackbody_Temp", "Brems_Temp"],
                 visuals={"point_estimate_text": False},
                 stats={"dist": {"nquantiles": 200}},
                 backend="matplotlib",

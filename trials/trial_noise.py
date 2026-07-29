@@ -86,19 +86,17 @@ observed_data = Data_true + Data_true_brems
 # observed_data = np.genfromtxt('86459_dante_power.csv', delimiter=',', skip_header=1)
 
 # #%%
-# plt.plot(given_PE, observed_data, label="total")
-# plt.plot(given_PE, Data_true, label="Blackbody")
-# plt.plot(given_PE, Data_true_brems, label="Brems")
+plt.plot(given_PE, observed_data, label="total")
 
 
 
-# plt.xlabel("Photon Energy (eV)")
-# plt.ylabel("Irradiance ()")
-# plt.legend(frameon=False)
-# plt.show()
+plt.xlabel("Photon Energy (eV)")
+plt.ylabel("Irradiance (W/m^2)")
+plt.legend(frameon=False)
+plt.show()
 #%%
 #snr_levels = np.arange(1, 30, step=6) 
-snr_levels = [30]
+snr_levels = [2,4,6,8,10,12,14,16,18,20]
 signal_power = np.mean(observed_data ** 2)
 r2_vals = []
 mse_vals = []
@@ -119,8 +117,8 @@ if __name__ == '__main__':
             x = given_PE
             y = y_scaled
             
-            T_guess = 100 #[eV]
-            T_guess_brems = 170 #[eV]
+            T_guess = 170 #[eV]
+            T_guess_brems = 100 #[eV]
             
             T_dist = pm.TruncatedNormal('T', mu=T_guess, sigma=50, lower=5)
             T_dist_brems = pm.TruncatedNormal('T_brems', mu=T_guess_brems, sigma=20, lower=5)
@@ -191,7 +189,7 @@ plt.plot(given_PE, brems_fit,c="C2",ls="--", label=f"fit_brems T={estimate_br_te
 
 
 plt.xlabel("Photon Energy (eV)")
-plt.ylabel("Irradiance ()")
+plt.ylabel("Irradiance (W/m^2)")
 plt.legend(frameon=False)
 plt.show()
 
