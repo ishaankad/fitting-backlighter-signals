@@ -60,7 +60,6 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     I_h = 2.18e-11 #[erg]
     V = 1e3 #[cm^3] DOUBLE CHECK
     D = 100 #[cm] DOUBLE CHECK
-# %%
     
 
     term1 = (8/3)*(((2*np.pi) / (3*m_e*k_b*T)) ** 0.5)
@@ -72,8 +71,9 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     irr_cgs = (j*V)/(D**2)
     irr_si = irr_cgs*1e-3
     return irr_si
- 
 
+test_vals = synthetic_brems(np.array([100, 500, 1000, 2000, 3000, 4000]), 300)
+print("here:",test_vals)
 #%%
 time_step = [1.0,2.0,3.0,4.0]
 fig,ax = plt.subplots()
@@ -152,7 +152,7 @@ for time in time_step:
         with pm.Model() as Model:
             # x = pos_PE
             # y = y_scaled
-            mask = given_PE > 0.5   
+            mask = given_PE > 100   
             x = given_PE[mask]
             y = y_scaled[mask]
 
@@ -168,12 +168,13 @@ for time in time_step:
             
             log_T = pm.Normal('log_T', mu=np.log(T_guess), sigma=80)
             T_dist = pm.Deterministic('Blackbody_Temp', pm.math.exp(log_T))
+
+
             
             # log_T_brems = pm.Normal('log_T_brems', mu=np.log(T_guess_brems), sigma=200) #Uniform
-            log_T_brems = pm.Uniform('log_T_brems', lower=100, upper=600)
-            T_dist_brems = pm.Deterministic('Brems_Temp', pm.math.exp(log_T_brems))
-            
-            # log_amp = pm.Normal('log_amp', mu=0, sigma=10)
+            # log_T_brems = pm.Uniform('log_T_brems', lower=np.log(100), upper=np.log(600))
+            # T_dist_brems = pm.Deterministic('Brems_Temp', pm.math.exp(log_T_brems))
+            T_dist_brems = pm.Uniform('Brems_Temp', lower=500, upper=5000)            # log_amp = pm.Normal('log_amp', mu=0, sigma=10)
             # amp = pm.math.exp(log_amp)
             
             # log_amp_bb = pm.Uniform('log_amp_bb', lower=1, upper=10)
