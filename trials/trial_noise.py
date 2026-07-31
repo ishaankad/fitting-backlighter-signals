@@ -68,7 +68,7 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     term1 = (8/3)*(((2*np.pi) / (3*m_e*k_b*T)) ** 0.5)
     term2 = (e_c**6) / (m_e * (c**3))
     term3 = (Z**2)*n_e*n_i
-    term4 = np.exp(-E_p / E_t)
+    term4 = np.exp(E_p / E_t)
     gaunt_factor = 1 + (0.1728) * (((E_p)/(I_h * (Z**2))) ** (1/3)) * (1 + ((2 * E_t) / (E_p)))
     j = (term1 * term2 * term3 * term4 * gaunt_factor)
     irr_cgs = (j*V)/(D**2)

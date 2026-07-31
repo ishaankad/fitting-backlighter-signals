@@ -72,8 +72,8 @@ def synthetic_brems(photon_energy_ev, T): # change formula
     irr_si = irr_cgs*1e-3
     return irr_si
 
-test_vals = synthetic_brems(np.array([100, 500, 1000, 2000, 3000, 4000]), 300)
-print("here:",test_vals)
+# test_vals = synthetic_brems(np.array([100, 500, 1000, 2000, 3000, 4000]), 300)
+# print("here:",test_vals)
 #%%
 time_step = [1.0,2.0,3.0,4.0]
 fig,ax = plt.subplots()
@@ -125,7 +125,7 @@ compare_br = []
 
 
 for time in time_step:
-    df = pd.read_csv(f'dante/86459_time_{time}_spectrum.csv')
+    df = pd.read_csv(f'dante_pchip/86455_time_{time}_spectrum.csv')
     # print(df.columns.tolist())
     # print(df.head())
     
