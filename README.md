@@ -4,7 +4,7 @@ By Isha Ankad and Pawel Kozlowski
 
 Institute of Computing in Research
 
-Objective: This project is aimed at creating a model that can estimate the internal properties of a hohlraum (or blackbody). By using data collected from a Dante diagnostic, the model is able to separate and fit a mixed signal, consisting of blackbody and bremsstrahlung radiation (noise), and estimate its properties using Monte Carlo algorithms.  
+Objective: This project is aimed at creating a model that can estimate the temperature of a hohlraum (or blackbody). By using data collected from a Dante diagnostic, the model is able to separate and fit a mixed signal, consisting of blackbody and bremsstrahlung radiation (noise), and estimate its properties using Monte Carlo algorithms.  
 
 ## How to Start:
 Terminal commands for Linux OS
